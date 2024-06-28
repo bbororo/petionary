@@ -15,3 +15,7 @@ spring:
         dialect: org.hibernate.dialect.MySQLDialect
   profiles:
     active: docker
+
+jwt:
+  token:
+    secret: ${SECRET_KEY}
