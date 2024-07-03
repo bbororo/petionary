@@ -1,4 +1,4 @@
-package org.pp.petionary.dto;
+package org.pp.petionary.dto.user;
 
 import lombok.Getter;
 import lombok.Setter;

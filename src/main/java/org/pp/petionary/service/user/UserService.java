@@ -1,7 +1,7 @@
 package org.pp.petionary.service.user;
 
 import lombok.RequiredArgsConstructor;
-import org.pp.petionary.dto.SignupRequestDto;
+import org.pp.petionary.dto.user.SignupRequestDto;
 import org.pp.petionary.dto.common.CommonResponseDto;
 import org.pp.petionary.entity.user.Users;
 import org.pp.petionary.repository.user.UserRepository;
