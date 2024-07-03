@@ -1,12 +1,18 @@
 package org.pp.petionary.service.user;
 
 import lombok.RequiredArgsConstructor;
+import org.pp.petionary.dto.user.CustomUserDetails;
+import org.pp.petionary.dto.user.PasswordUpdateDto;
 import org.pp.petionary.dto.user.SignupRequestDto;
 import org.pp.petionary.dto.common.CommonResponseDto;
+import org.pp.petionary.dto.user.UserModifyDto;
 import org.pp.petionary.entity.user.Users;
+import org.pp.petionary.exception.BadRequestException;
+import org.pp.petionary.exception.NotFoundException;
 import org.pp.petionary.repository.user.UserRepository;
 import org.pp.petionary.service.common.CommonService;
 import org.pp.petionary.type.UserRoleEnum;
+import org.pp.petionary.type.common.ErrorCode;
 import org.pp.petionary.type.common.SuccessCode;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -65,5 +71,37 @@ public class UserService {
 
         return commonService.successResponse(SuccessCode.SIGNUP_SUCCESS.getDescription(), HttpStatus.CREATED, requestDto);
     }
+
+    @Transactional
+    public CommonResponseDto<Object> modifyUser(CustomUserDetails customUserDetails, UserModifyDto userModifyDto) {
+
+        Users user = userRepository.findByEmail(customUserDetails.getEmail())
+                .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND));
+
+        user.userModify(userModifyDto.getAddress(), userModifyDto.getPhone());
+        userRepository.save(user);
+
+        return commonService.successResponse(SuccessCode.USER_INFO_UPDATE_SUCCESS.getDescription(), HttpStatus.OK, null);
+    }
+
+    @Transactional
+    public CommonResponseDto<Object> modifyPassword(CustomUserDetails customUserDetails, PasswordUpdateDto passwordUpdateDto) {
+
+        Users user = userRepository.findByEmail(customUserDetails.getEmail())
+                .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND));
+
+        // 현재 비밀번호 확인
+        if (!bCryptPasswordEncoder.matches(passwordUpdateDto.getCurrentPassword(), user.getPassword())) {
+            throw new BadRequestException(ErrorCode.PASSWORD_CHECK_FAIL);
+        }
+
+        // 새로운 비밀번호 암호화 및 저장
+        String newEncodedPassword = bCryptPasswordEncoder.encode(passwordUpdateDto.getNewPassword());
+        user.setPassword(newEncodedPassword);
+        userRepository.save(user);
+
+        return commonService.successResponse(SuccessCode.PASSWORD_UPDATE_SUCCESS.getDescription(), HttpStatus.OK, null);
+    }
+
 
 }

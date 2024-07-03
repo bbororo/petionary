@@ -13,10 +13,10 @@ public class RefreshEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String username;
+    private String email;
     private String refresh;
     private String expiration;
 
 
-    // TODO : 기기 컬럼 추가 필요, email로 변경
+    // TODO : 기기 컬럼 추가 필요
 }

@@ -119,13 +119,13 @@ public class JwtFilter extends OncePerRequestFilter {
         }
 
 // username, role 값을 획득
-        String username = jwtUtil.getUsername(accessToken);
+        String email = jwtUtil.getUsername(accessToken);
         String role = jwtUtil.getRole(accessToken);
         UserRoleEnum userRoleEnum = UserRoleEnum.valueOf(role);
 
 
         Users user = new Users();
-        user.setUsername(username);
+        user.setEmail(email);
         user.setRole(userRoleEnum);
         CustomUserDetails customUserDetails = new CustomUserDetails(user);
 

@@ -48,4 +48,9 @@ public class Users extends BaseTime {
         this.phone = phone;
         this.role = role;
     }
+
+    public void userModify(String address, String phone){
+        this.address = address;
+        this.phone = phone;
+    }
 }

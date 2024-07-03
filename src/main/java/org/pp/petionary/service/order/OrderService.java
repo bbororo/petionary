@@ -48,8 +48,9 @@ public class OrderService {
 
     public CommonResponseDto<Object> postOrder(CustomUserDetails customUserDetails,OrderRequestDto orderRequestDto) {
 
-        // TODO 회원검증 추가
-        Users user = userRepository.findByUsername(customUserDetails.getUsername());
+
+        Users user = userRepository.findByEmail(customUserDetails.getEmail())
+                .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND));
 
         Product product = productRepository.findById(orderRequestDto.getProductId())
                 .orElseThrow(() -> new NotFoundException(ErrorCode.PRODUCT_NOT_FOUND));
@@ -91,7 +92,8 @@ public class OrderService {
     @Transactional
     public CommonResponseDto<Object> cancelOrder(CustomUserDetails customUserDetails, Long orderId) {
 
-        Users user = userRepository.findByUsername(customUserDetails.getUsername());
+        Users user = userRepository.findByEmail(customUserDetails.getEmail())
+                .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND));
 
         Orders order = orderRepository.findByOrderIdAndUsers(orderId, user)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.ORDER_NOT_FOUND));
@@ -114,7 +116,8 @@ public class OrderService {
     @Transactional
     public CommonResponseDto<Object> refundOrder(CustomUserDetails customUserDetails, Long orderId) {
 
-        Users user = userRepository.findByUsername(customUserDetails.getUsername());
+        Users user = userRepository.findByEmail(customUserDetails.getEmail())
+                .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND));
 
         Orders order = orderRepository.findByOrderIdAndUsers(orderId, user)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.ORDER_NOT_FOUND));
@@ -187,7 +190,8 @@ public class OrderService {
     @Transactional
     public CommonResponseDto<Object> getOrders(CustomUserDetails customUserDetails) {
 
-        Users user = userRepository.findByUsername(customUserDetails.getUsername());
+        Users user = userRepository.findByEmail(customUserDetails.getEmail())
+                .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND));
 
         List<Orders> ordersList = orderRepository.findOrdersByUsersId(user.getUserId());
         List<OrderResponseDto> orderResponseDtoList = ordersList.stream()
