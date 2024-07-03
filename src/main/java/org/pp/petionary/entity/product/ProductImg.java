@@ -1,12 +1,10 @@
-package org.pp.petionary.entity.item;
+package org.pp.petionary.entity.product;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.pp.petionary.entity.basetime.BaseTime;
-
-import java.time.LocalDateTime;
 
 @Entity
 @NoArgsConstructor

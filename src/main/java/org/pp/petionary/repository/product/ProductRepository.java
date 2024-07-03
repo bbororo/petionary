@@ -1,6 +1,6 @@
-package org.pp.petionary.repository.item;
+package org.pp.petionary.repository.product;
 
-import org.pp.petionary.entity.item.Product;
+import org.pp.petionary.entity.product.Product;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

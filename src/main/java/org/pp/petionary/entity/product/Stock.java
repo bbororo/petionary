@@ -1,4 +1,4 @@
-package org.pp.petionary.entity.item;
+package org.pp.petionary.entity.product;
 
 import jakarta.persistence.*;
 import lombok.Builder;

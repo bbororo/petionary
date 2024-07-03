@@ -1,6 +1,6 @@
-package org.pp.petionary.repository.item;
+package org.pp.petionary.repository.product;
 
-import org.pp.petionary.entity.item.ProductImg;
+import org.pp.petionary.entity.product.ProductImg;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

@@ -16,7 +16,7 @@ public class OrderResponseDto {
     private String delivery_request;
     private LocalDateTime orderDate;
     private int totalPrice;
-    private List<OrderItemDto> orderItemList;
+    private List<OrderProductDto> orderProductList;
 
 
 }

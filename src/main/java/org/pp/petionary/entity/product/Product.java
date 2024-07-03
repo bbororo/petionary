@@ -1,4 +1,4 @@
-package org.pp.petionary.entity.item;
+package org.pp.petionary.entity.product;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
@@ -6,7 +6,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.pp.petionary.entity.basetime.BaseTime;
-import org.pp.petionary.entity.order.OrderItem;
 import org.pp.petionary.type.ProductStatus;
 
 import java.util.List;

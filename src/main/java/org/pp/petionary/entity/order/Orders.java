@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import org.pp.petionary.entity.basetime.BaseTime;
 import org.pp.petionary.entity.user.Users;
 import org.pp.petionary.type.OrderStatus;
@@ -46,27 +45,27 @@ public class Orders extends BaseTime {
     private Users users;
 
     @OneToMany(mappedBy = "orders")
-    private List<OrderItem> orderItemList = new ArrayList<>();
+    private List<OrderProduct> orderProductList = new ArrayList<>();
 
     @Builder
-    public Orders(String orderAddress, OrderStatus orderStatus, LocalDateTime orderDate, /*String refundReason, */String delivery_request, Users users, List<OrderItem> orderItemList) {
+    public Orders(String orderAddress, OrderStatus orderStatus, LocalDateTime orderDate, /*String refundReason, */String delivery_request, Users users, List<OrderProduct> orderProductList) {
         this.orderAddress = orderAddress;
         this.orderStatus = orderStatus;
         this.orderDate = orderDate;
 //        this.refundReason = refundReason;
         this.delivery_request = delivery_request;
         this.users = users;
-        this.orderItemList = new ArrayList<>();
+        this.orderProductList = new ArrayList<>();
     }
 
-    public void addOrderItem(OrderItem orderItem) {
-        orderItemList.add(orderItem);
-        orderItem.setOrders(this); // 양방향 연관관계 설정
+    public void addOrderProduct(OrderProduct orderProduct) {
+        orderProductList.add(orderProduct);
+        orderProduct.setOrders(this); // 양방향 연관관계 설정
     }
 
     public int totalPrice() {
-        return orderItemList.stream()
-                .mapToInt(OrderItem::getOrderPrice)
+        return orderProductList.stream()
+                .mapToInt(OrderProduct::getOrderPrice)
                 .sum();
     }
 

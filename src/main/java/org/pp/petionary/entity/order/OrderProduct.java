@@ -6,20 +6,20 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.pp.petionary.entity.basetime.BaseTime;
-import org.pp.petionary.entity.item.Product;
+import org.pp.petionary.entity.product.Product;
 
 @Entity
 @Getter
 @NoArgsConstructor
-public class OrderItem extends BaseTime  {
+public class OrderProduct extends BaseTime  {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "order_item_id")
-    private Long orderItemId;
+    @Column(name = "order_product_id")
+    private Long orderProductId;
 
-    @Column(name = "order_cnt")
-    private int orderCnt;
+    @Column(name = "order_product_count")
+    private int orderProductCount;
 
     @Column(name = "order_price")
     private int orderPrice;
@@ -35,8 +35,8 @@ public class OrderItem extends BaseTime  {
 
 
     @Builder
-    public OrderItem(int orderCnt, int orderPrice, Orders orders, Product product) {
-        this.orderCnt = orderCnt;
+    public OrderProduct(int orderProductCount, int orderPrice, Orders orders, Product product) {
+        this.orderProductCount = orderProductCount;
         this.orderPrice = orderPrice;
         this.orders = orders;
         this.product = product;

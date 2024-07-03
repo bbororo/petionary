@@ -5,8 +5,8 @@ import lombok.Getter;
 
 @Getter
 @Builder
-public class OrderItemDto {
-    private Long orderItemId;
+public class OrderProductDto {
+    private Long orderProductId;
     private String productName;
     private int count;
     private int price;

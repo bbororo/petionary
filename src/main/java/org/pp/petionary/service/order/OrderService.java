@@ -1,22 +1,21 @@
 package org.pp.petionary.service.order;
 
 import lombok.RequiredArgsConstructor;
-import org.pp.petionary.dto.ExampleDto;
 import org.pp.petionary.dto.common.CommonResponseDto;
-import org.pp.petionary.dto.order.OrderItemDto;
+import org.pp.petionary.dto.order.OrderProductDto;
 import org.pp.petionary.dto.order.OrderRequestDto;
 import org.pp.petionary.dto.order.OrderResponseDto;
 import org.pp.petionary.dto.order.OrderResponseListDto;
 import org.pp.petionary.dto.user.CustomUserDetails;
-import org.pp.petionary.entity.item.Product;
-import org.pp.petionary.entity.item.Stock;
-import org.pp.petionary.entity.order.OrderItem;
+import org.pp.petionary.entity.product.Product;
+import org.pp.petionary.entity.product.Stock;
+import org.pp.petionary.entity.order.OrderProduct;
 import org.pp.petionary.entity.order.Orders;
 import org.pp.petionary.entity.user.Users;
 import org.pp.petionary.exception.BadRequestException;
 import org.pp.petionary.exception.NotFoundException;
-import org.pp.petionary.repository.item.ProductRepository;
-import org.pp.petionary.repository.order.OrderItemRepository;
+import org.pp.petionary.repository.product.ProductRepository;
+import org.pp.petionary.repository.order.OrderProductRepository;
 import org.pp.petionary.repository.order.OrderRepository;
 import org.pp.petionary.repository.user.UserRepository;
 import org.pp.petionary.service.common.CommonService;
@@ -42,7 +41,7 @@ public class OrderService {
 
     private final CommonService commonService;
     private final OrderRepository orderRepository;
-    private final OrderItemRepository orderItemRepository;
+    private final OrderProductRepository orderProductRepository;
     private final ProductRepository productRepository;
     private final UserRepository userRepository;
     private static final Logger logger = (Logger) LoggerFactory.getLogger(OrderService.class);
@@ -65,8 +64,8 @@ public class OrderService {
 
         int orderPrice = product.getSale() * orderRequestDto.getCount();
 
-        OrderItem orderItem = OrderItem.builder()
-                .orderCnt(orderRequestDto.getCount())
+        OrderProduct orderProduct = OrderProduct.builder()
+                .orderProductCount(orderRequestDto.getCount())
                 .orderPrice(orderPrice)
                 .product(product)
                 .build();
@@ -77,11 +76,11 @@ public class OrderService {
                 .users(user)
                 .orderStatus(OrderStatus.ORDER_COMPLETE)
                 .orderDate(LocalDateTime.now())
-                .orderItemList(Collections.singletonList(orderItem))
+                .orderProductList(Collections.singletonList(orderProduct))
                 .build();
 
-        orderItemRepository.save(orderItem);
-        order.addOrderItem(orderItem);
+        orderProductRepository.save(orderProduct);
+        order.addOrderProduct(orderProduct);
         orderRepository.save(order);
 
 
@@ -103,9 +102,9 @@ public class OrderService {
 
         orderRepository.updateOrderStatus(orderId, OrderStatus.CANCELED);
 
-        for (OrderItem orderItem : order.getOrderItemList()) {
-            Stock stock = orderItem.getProduct().getStock();
-            stock.increaseStock(orderItem.getOrderCnt());
+        for (OrderProduct orderProduct : order.getOrderProductList()) {
+            Stock stock = orderProduct.getProduct().getStock();
+            stock.increaseStock(orderProduct.getOrderProductCount());
         }
 
         return commonService.successResponse(SuccessCode.ORDER_CANCEL_SUCCESS.getDescription(), HttpStatus.OK, null);
@@ -146,9 +145,9 @@ public class OrderService {
         List<Orders> orderList = orderRepository.findAllByOrderStatusAndOrderDateBefore(OrderStatus.REQUEST_REFUND, LocalDateTime.now().minusDays(1));
 
         for (Orders order : orderList) {
-            for (OrderItem orderItem : order.getOrderItemList()) {
-                Stock stock = orderItem.getProduct().getStock();
-                stock.increaseStock(orderItem.getOrderCnt());
+            for (OrderProduct orderProduct : order.getOrderProductList()) {
+                Stock stock = orderProduct.getProduct().getStock();
+                stock.increaseStock(orderProduct.getOrderProductCount());
 
             }
             orderRepository.updateOrderStatus(order.getOrderId(), OrderStatus.REFUNDED);
@@ -199,12 +198,12 @@ public class OrderService {
                         .delivery_request(order.getDelivery_request())
                         .orderDate(order.getOrderDate())
                         .totalPrice(order.totalPrice())
-                        .orderItemList(order.getOrderItemList().stream()
-                                .map(orderItem -> OrderItemDto.builder()
-                                        .orderItemId(orderItem.getOrderItemId())
-                                        .productName(orderItem.getProduct().getName())
-                                        .count(orderItem.getOrderCnt())
-                                        .price(orderItem.getOrderPrice())
+                        .orderProductList(order.getOrderProductList().stream()
+                                .map(orderProduct -> OrderProductDto.builder()
+                                        .orderProductId(orderProduct.getOrderProductId())
+                                        .productName(orderProduct.getProduct().getName())
+                                        .count(orderProduct.getOrderProductCount())
+                                        .price(orderProduct.getOrderPrice())
                                         .build())
                                 .collect(Collectors.toList()))
                         .build())
