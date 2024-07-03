@@ -18,5 +18,5 @@ public class RefreshEntity {
     private String expiration;
 
 
-    // TODO : 기기 컬럼 추가 필요, email로 변경
+    // TODO : 기기 컬럼 추가 필요
 }
