@@ -1,9 +1,6 @@
 package org.pp.petionary.entity.user;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -19,6 +16,7 @@ public class RefreshEntity {
     private String username;
     private String refresh;
     private String expiration;
+
 
     // TODO : 기기 컬럼 추가 필요, email로 변경
 }

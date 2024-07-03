@@ -5,12 +5,11 @@ import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public enum ItemType {
+public enum ProductStatus {
 
-    // 사료, 장난감, 생활용품
-    FOOD(""),
-    TOY("장난감"),
-    LIVING("생활용품");
+    // 품절, 판매중
+    SOLDOUT("품절"),
+    SELLING("판매중");
 
     private final String description;
 }
