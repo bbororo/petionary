@@ -6,7 +6,7 @@ services:
       dockerfile: Dockerfile
     container_name: my_petionary_container
     ports:
-      - "8080:8080"
+      - "9090:8080"
     depends_on:
       - db
     env_file:
@@ -19,6 +19,8 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
       MYSQL_DATABASE: ${DATABASE_NAME}
+      MYSQL_USER: ${DB_USER}  # 이 줄 추가
+      MYSQL_PASSWORD: ${DB_PASSWORD}  # 이 줄 추가
     ports:
       - "3307:3306"
     volumes:
