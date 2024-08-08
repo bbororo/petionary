@@ -1,5 +1,6 @@
 package org.pp.petionary.product.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
@@ -25,6 +26,7 @@ public class Stock {
 
     @OneToOne
     @JoinColumn(name = "product_id")
+    @JsonBackReference
     private Product product;
 
     @Builder
@@ -34,12 +36,13 @@ public class Stock {
         this.product = product;
     }
 
-    public void decreaseStock (int amount){
+    public void decreaseStock (int amount, Product product){
         if (this.stockAmount< amount) {
             throw new BadRequestException(ErrorCode.OUT_OF_STOCK);
         }
         this.stockAmount -= amount;
         this.sellAmount += amount;
+        this.product = product;
     }
 
     public void increaseStock(int amount) {

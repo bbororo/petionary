@@ -7,11 +7,13 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.pp.petionary.global.entity.BaseTime;
 import org.pp.petionary.user.type.UserRoleEnum;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @Entity
 @NoArgsConstructor
 @Getter
 @Setter
+@EntityListeners(value = AuditingEntityListener.class)
 @Table(name = "users")
 public class Users extends BaseTime {
 

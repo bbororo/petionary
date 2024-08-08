@@ -6,6 +6,8 @@ import org.pp.petionary.order.dto.OrderProductDto;
 import org.pp.petionary.order.dto.OrderRequestDto;
 import org.pp.petionary.order.dto.OrderResponseDto;
 import org.pp.petionary.order.dto.OrderResponseListDto;
+import org.pp.petionary.product.repository.StockRepository;
+import org.pp.petionary.product.service.StockService;
 import org.pp.petionary.user.dto.CustomUserDetails;
 import org.pp.petionary.product.entity.Product;
 import org.pp.petionary.product.entity.Stock;
@@ -24,6 +26,7 @@ import org.pp.petionary.global.type.ErrorCode;
 import org.pp.petionary.global.type.SuccessCode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -40,53 +43,16 @@ import java.util.stream.Collectors;
 public class OrderService {
 
     private final CommonService commonService;
+    private final RedisTemplate<String, Stock> redisTemplate;
+    private final StockService stockService;
     private final OrderRepository orderRepository;
     private final OrderProductRepository orderProductRepository;
     private final ProductRepository productRepository;
+    private final StockRepository stockRepository;
     private final UserRepository userRepository;
     private static final Logger logger = (Logger) LoggerFactory.getLogger(OrderService.class);
 
-    public CommonResponseDto<Object> postOrder(CustomUserDetails customUserDetails,OrderRequestDto orderRequestDto) {
 
-
-        Users user = userRepository.findByEmail(customUserDetails.getEmail())
-                .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND));
-
-        Product product = productRepository.findById(orderRequestDto.getProductId())
-                .orElseThrow(() -> new NotFoundException(ErrorCode.PRODUCT_NOT_FOUND));
-
-        // 재고 확인
-        Stock stock = product.getStock();
-        if (stock.getStockAmount() < orderRequestDto.getCount()){
-            throw new BadRequestException(ErrorCode.OUT_OF_STOCK);
-        }
-        // 재고 감소
-        stock.decreaseStock(orderRequestDto.getCount());
-
-        int orderPrice = product.getSale() * orderRequestDto.getCount();
-
-        OrderProduct orderProduct = OrderProduct.builder()
-                .orderProductCount(orderRequestDto.getCount())
-                .orderPrice(orderPrice)
-                .product(product)
-                .build();
-
-        Orders order = Orders.builder()
-                .orderAddress(orderRequestDto.getAddress())
-                .delivery_request(orderRequestDto.getDeliveryRequest())
-                .users(user)
-                .orderStatus(OrderStatus.ORDER_COMPLETE)
-                .orderDate(LocalDateTime.now())
-                .orderProductList(Collections.singletonList(orderProduct))
-                .build();
-
-        orderProductRepository.save(orderProduct);
-        order.addOrderProduct(orderProduct);
-        orderRepository.save(order);
-
-
-        return commonService.successResponse(SuccessCode.ORDER_SUCCESS.getDescription(), HttpStatus.OK, null);
-    }
 
     // 주문 취소
     @Transactional
@@ -221,6 +187,56 @@ public class OrderService {
         return commonService.successResponse(SuccessCode.ORDER_STATUS_INQUIRY_SUCCESS.getDescription(), HttpStatus.OK, orderResponseListDto);
     }
 
+
+    // 주문하기
+    @Transactional
+    public CommonResponseDto<Object> postOrder(CustomUserDetails customUserDetails,OrderRequestDto orderRequestDto) {
+
+        Users user = userRepository.findByEmail(customUserDetails.getEmail())
+                .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND));
+
+        Product product = productRepository.findById(orderRequestDto.getProductId())
+                .orElseThrow(() -> new NotFoundException(ErrorCode.PRODUCT_NOT_FOUND));
+
+        // 재고 확인
+        Stock stock = stockService.getStock(product.getStock().getStockId());
+        if (stock.getStockAmount() < orderRequestDto.getCount()){
+            throw new BadRequestException(ErrorCode.OUT_OF_STOCK);
+        }
+        // 재고 감소
+        stock.decreaseStock(orderRequestDto.getCount(), product);
+
+        // 변경사항 저장
+//        stockRepository.save(stock);
+        stockService.updateStock(stock);
+
+        var key = "stock:%d".formatted(stock.getStockId());
+        redisTemplate.opsForValue().set(key, stock);
+
+        int orderPrice = product.getSale() * orderRequestDto.getCount();
+
+        OrderProduct orderProduct = OrderProduct.builder()
+                .orderProductCount(orderRequestDto.getCount())
+                .orderPrice(orderPrice)
+                .product(product)
+                .build();
+
+        Orders order = Orders.builder()
+                .orderAddress(orderRequestDto.getAddress())
+                .delivery_request(orderRequestDto.getDeliveryRequest())
+                .users(user)
+                .orderStatus(OrderStatus.ORDER_COMPLETE)
+                .orderDate(LocalDateTime.now())
+                .orderProductList(Collections.singletonList(orderProduct))
+                .build();
+
+        orderProductRepository.save(orderProduct);
+        order.addOrderProduct(orderProduct);
+        orderRepository.save(order);
+
+
+        return commonService.successResponse(SuccessCode.ORDER_SUCCESS.getDescription(), HttpStatus.OK, null);
+    }
 
 
 }
