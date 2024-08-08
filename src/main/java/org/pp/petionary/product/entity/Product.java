@@ -38,7 +38,7 @@ public class Product extends BaseTime {
     @JsonManagedReference
     private List<ProductImg> productImgList;
 
-    @OneToOne(mappedBy = "product")
+    @OneToOne(mappedBy = "product", fetch = FetchType.LAZY)
     private Stock stock;
 
     @Builder

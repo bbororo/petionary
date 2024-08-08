@@ -46,14 +46,19 @@ public class OrderService {
     private final UserRepository userRepository;
     private static final Logger logger = (Logger) LoggerFactory.getLogger(OrderService.class);
 
+    @Transactional
     public CommonResponseDto<Object> postOrder(CustomUserDetails customUserDetails,OrderRequestDto orderRequestDto) {
 
 
         Users user = userRepository.findByEmail(customUserDetails.getEmail())
                 .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND));
 
-        Product product = productRepository.findById(orderRequestDto.getProductId())
+//        Product product = productRepository.findById(orderRequestDto.getProductId())
+//                .orElseThrow(() -> new NotFoundException(ErrorCode.PRODUCT_NOT_FOUND));
+
+        Product product = productRepository.findByProductWithPessimisticLock(orderRequestDto.getProductId())
                 .orElseThrow(() -> new NotFoundException(ErrorCode.PRODUCT_NOT_FOUND));
+        logger.info("비관적락 적용");
 
         // 재고 확인
         Stock stock = product.getStock();
